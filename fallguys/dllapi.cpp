@@ -74,17 +74,13 @@ void NewTouch(edict_t *pentTouched, edict_t *pentOther)
 		{
 			if (pentOther->v.solid == SOLID_TRIGGER)
 			{
-				if (g_pfn_CASHook_Call)
-				{
-					g_pfn_CASHook_Call(&g_PlayerTouchTriggerHook, 0, pentTouched->pvPrivateData, pentOther->pvPrivateData);
-				}
+				if(ASEXT_CallHook)
+					(*ASEXT_CallHook)(g_PlayerTouchTriggerHook, 0, pentTouched->pvPrivateData, pentOther->pvPrivateData);
 			}
 			else if (pentOther->v.solid != SOLID_NOT)
 			{
-				if (g_pfn_CASHook_Call)
-				{
-					g_pfn_CASHook_Call(&g_PlayerTouchImpactHook, 0, pentTouched->pvPrivateData, pentOther->pvPrivateData);
-				}
+				if (ASEXT_CallHook)
+					(*ASEXT_CallHook)(g_PlayerTouchImpactHook, 0, pentTouched->pvPrivateData, pentOther->pvPrivateData);
 			}
 		}
 	}
@@ -132,11 +128,11 @@ int NewAddToFullPack_Post(struct entity_state_s *state, int entindex, edict_t *e
 			return 0;
 		}
 
-		if (g_pfn_CASHook_Call)
+		if (ASEXT_CallHook)
 		{
 			int uiFlags = 0;
 
-			g_pfn_CASHook_Call(&g_AddToFullPackHook, 0, state, entindex, ent, host, hostflags, player, &uiFlags);
+			(*ASEXT_CallHook)(g_AddToFullPackHook, 0, state, entindex, ent, host, hostflags, player, &uiFlags);
 
 			if (uiFlags & 1)
 			{
@@ -209,10 +205,8 @@ void NewPlayerPostThink(edict_t* pEntity)
 
 void NewPlayerPostThink_Post(edict_t *pEntity)
 {
-	if (g_pfn_CASHook_Call)
-	{
-		g_pfn_CASHook_Call(&g_PlayerPostThinkPostHook, 0, pEntity->pvPrivateData);
-	}
+	if(ASEXT_CallHook)
+		(*ASEXT_CallHook)(g_PlayerPostThinkPostHook, 0, pEntity->pvPrivateData);
 
 	SET_META_RESULT(MRES_IGNORED);
 }
@@ -365,12 +359,12 @@ C_DLLEXPORT int GetEntityAPI2_Post(DLL_FUNCTIONS *pFunctionTable, int *interface
 {
 	if (!pFunctionTable)
 	{
-		UTIL_LogPrintf("GetEntityAPI2_Post called with null pFunctionTable");
+		LOG_ERROR(PLID, "GetEntityAPI2_Post called with null pFunctionTable");
 		return FALSE;
 	}
 	else if (*interfaceVersion != INTERFACE_VERSION)
 	{
-		UTIL_LogPrintf("GetEntityAPI2_Post version mismatch; requested=%d ours=%d", *interfaceVersion, INTERFACE_VERSION);
+		LOG_ERROR(PLID, "GetEntityAPI2_Post version mismatch; requested=%d ours=%d", *interfaceVersion, INTERFACE_VERSION);
 		//! Tell metamod what version we had, so it can figure out who is out of date.
 		*interfaceVersion = INTERFACE_VERSION;
 		return FALSE;
@@ -383,12 +377,12 @@ C_DLLEXPORT int GetEntityAPI2(DLL_FUNCTIONS *pFunctionTable, int *interfaceVersi
 {
 	if(!pFunctionTable)
 	{
-		UTIL_LogPrintf("GetEntityAPI2 called with null pFunctionTable");
+		LOG_ERROR(PLID, "GetEntityAPI2 called with null pFunctionTable");
 		return FALSE;
 	}
 	else if(*interfaceVersion != INTERFACE_VERSION)
 	{
-		UTIL_LogPrintf("GetEntityAPI2 version mismatch; requested=%d ours=%d", *interfaceVersion, INTERFACE_VERSION);
+		LOG_ERROR(PLID, "GetEntityAPI2 version mismatch; requested=%d ours=%d", *interfaceVersion, INTERFACE_VERSION);
 		//! Tell metamod what version we had, so it can figure out who is out of date.
 		*interfaceVersion = INTERFACE_VERSION;
 		return FALSE;
@@ -426,11 +420,11 @@ C_DLLEXPORT int GetNewDLLFunctions(NEW_DLL_FUNCTIONS* pNewDllFunctionTable,
 	int* interfaceVersion)
 {
 	if (!pNewDllFunctionTable) {
-		UTIL_LogPrintf("GetNewDLLFunctions called with null pFunctionTable");
+		LOG_ERROR(PLID, "GetNewDLLFunctions called with null pFunctionTable");
 		return(FALSE);
 	}
 	else if (*interfaceVersion != NEW_DLL_FUNCTIONS_VERSION) {
-		UTIL_LogPrintf("GetNewDLLFunctions version mismatch; requested=%d ours=%d", *interfaceVersion, NEW_DLL_FUNCTIONS_VERSION);
+		LOG_ERROR(PLID, "GetNewDLLFunctions version mismatch; requested=%d ours=%d", *interfaceVersion, NEW_DLL_FUNCTIONS_VERSION);
 		//! Tell metamod what version we had, so it can figure out who is out of date.
 		*interfaceVersion = NEW_DLL_FUNCTIONS_VERSION;
 		return(FALSE);

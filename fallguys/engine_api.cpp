@@ -257,11 +257,11 @@ C_DLLEXPORT int GetEngineFunctions(enginefuncs_t *pengfuncsFromEngine,
 		int *interfaceVersion) 
 {
 	if(!pengfuncsFromEngine) {
-		UTIL_LogPrintf("GetEngineFunctions called with null pengfuncsFromEngine");
+		LOG_ERROR(PLID, "GetEngineFunctions called with null pengfuncsFromEngine");
 		return(FALSE);
 	}
 	else if(*interfaceVersion != ENGINE_INTERFACE_VERSION) {
-		UTIL_LogPrintf("GetEngineFunctions version mismatch; requested=%d ours=%d", *interfaceVersion, ENGINE_INTERFACE_VERSION);
+		LOG_ERROR(PLID, "GetEngineFunctions version mismatch; requested=%d ours=%d", *interfaceVersion, ENGINE_INTERFACE_VERSION);
 		// Tell metamod what version we had, so it can figure out who is out of date.
 		*interfaceVersion = ENGINE_INTERFACE_VERSION;
 		return(FALSE);

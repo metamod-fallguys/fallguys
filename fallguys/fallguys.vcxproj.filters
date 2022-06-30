@@ -5,9 +5,6 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Source\Detours">
-      <UniqueIdentifier>{5d6605e4-1ea1-4f95-9d61-4c03768775d8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
@@ -25,24 +22,6 @@
     </ClCompile>
     <ClCompile Include="meta_api.cpp">
       <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="sdk_util.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\CDetour\detours.cpp">
-      <Filter>Source\Detours</Filter>
-    </ClCompile>
-    <ClCompile Include="..\CDetour\libudis86\itab.c">
-      <Filter>Source\Detours</Filter>
-    </ClCompile>
-    <ClCompile Include="..\CDetour\libudis86\udis86.c">
-      <Filter>Source\Detours</Filter>
-    </ClCompile>
-    <ClCompile Include="..\CDetour\libudis86\decode.c">
-      <Filter>Source\Detours</Filter>
-    </ClCompile>
-    <ClCompile Include="..\CDetour\asm\asm.c">
-      <Filter>Source\Detours</Filter>
     </ClCompile>
     <ClCompile Include="engine_hook.cpp">
       <Filter>Source</Filter>
@@ -76,7 +55,7 @@
     <ClInclude Include="physics.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="mhutil.h">
+    <ClInclude Include="asext_api.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

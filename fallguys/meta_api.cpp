@@ -65,7 +65,7 @@ static META_FUNCTIONS gMetaFunctionTable = {
 plugin_info_t Plugin_info = {
 	META_INTERFACE_VERSION,	// ifvers
 	"FallGuys",	// name
-	"1.1",	// version
+	"1.2",	// version
 	"2022",	// date
 	"hzqst",	// author
 	"https://github.com/hzqst/metamod-fallguys",	// url
@@ -83,9 +83,14 @@ mutil_funcs_t *gpMetaUtilFuncs;		// metamod utility functions
 //  ifvers			(given) interface_version metamod is using
 //  pPlugInfo		(requested) struct with info about plugin
 //  pMetaUtilFuncs	(given) table of utility functions provided by metamod
-C_DLLEXPORT int Meta_Query(char * /*ifvers */, plugin_info_t **pPlugInfo,
-		mutil_funcs_t *pMetaUtilFuncs) 
+C_DLLEXPORT int Meta_Query(char * interfaceVersion, plugin_info_t **pPlugInfo, mutil_funcs_t *pMetaUtilFuncs) 
 {
+	if (0 != strcmp(interfaceVersion, META_INTERFACE_VERSION))
+	{
+		pMetaUtilFuncs->pfnLogError(PLID, "Meta_Query version mismatch! expect %s but got %s", META_INTERFACE_VERSION, interfaceVersion);
+		return FALSE;
+	}
+
 	// Give metamod our plugin_info struct
 	*pPlugInfo=&Plugin_info;
 	// Get metamod utility function table.
@@ -117,45 +122,40 @@ C_DLLEXPORT int Meta_Attach(PLUG_LOADTIME /* now */,
 	memcpy(pFunctionTable, &gMetaFunctionTable, sizeof(META_FUNCTIONS));
 	gpGamedllFuncs = pGamedllFuncs;
 
-	CDetourManager::Init();
-
-	auto engine = MH_GetModuleBase(ENGINE_DLL_NAME);
+	auto engine = gpMetaUtilFuncs->pfnGetEngineBase();
 
 	if (!engine)
 	{
-		LOG_ERROR(PLID, "engine dll not found !");
+		LOG_ERROR(PLID, "engine dll not found!");
 		return FALSE;
 	}
 
-	auto server = MH_GetModuleBase(gpMetaUtilFuncs->pfnGetGameInfo(PLID, GINFO_REALDLL_FULLPATH));
+	void *asext = NULL;
 
-#ifdef PLATFORM_WINDOWS
-	if (!server)
-	{
-		server = MH_GetModuleBase(gpMetaUtilFuncs->pfnGetGameInfo(PLID, GINFO_DLL_FILENAME));
-	}
+#ifdef _WIN32
+	LOAD_PLUGIN(PLID, "addons/metamod/dlls/asext.dll", PLUG_LOADTIME::PT_ANYTIME, &asext);
+#else
+	LOAD_PLUGIN(PLID, "linux addons/metamod/dlls/asext.so", PLUG_LOADTIME::PT_ANYTIME, &asext);
 #endif
-
-	if (!server)
+	if (!asext)
 	{
-		LOG_ERROR(PLID, "server dll not found !");
+		LOG_ERROR(PLID, "asext dll not found!");
 		return FALSE;
 	}
+
+	IMPORT_FUNCTION_DLSYM(asext, ASEXT_RegisterDocInitCallback);
+	IMPORT_FUNCTION_DLSYM(asext, ASEXT_RegisterObjectMethod);
+	IMPORT_FUNCTION_DLSYM(asext, ASEXT_RegisterObjectType);
+	IMPORT_FUNCTION_DLSYM(asext, ASEXT_RegisterObjectProperty);
+	IMPORT_FUNCTION_DLSYM(asext, ASEXT_RegisterHook);
+	IMPORT_FUNCTION_DLSYM(asext, ASEXT_CallHook);
 
 	//Fill private engine functions
 	FILL_FROM_SIGNATURE(engine, SV_PushEntity);
 	FILL_FROM_SIGNATURE(engine, SV_PushMove);
 	FILL_FROM_SIGNATURE(engine, SV_PushRotate);
 
-	//Fill private server functions
-	FILL_FROM_SIGNATURE(server, CASHook_CASHook);
-	FILL_FROM_SIGNATURE(server, CASHook_Call);
-
-#ifdef PLATFORM_WINDOWS
-
-	FILL_FROM_SIGNATURED_CALLER_FROM_END(server, CASDocumentation_RegisterObjectType, -1);
-	FILL_FROM_SIGNATURED_CALLER_FROM_END(server, CASDocumentation_RegisterObjectProperty, -7);
-	FILL_FROM_SIGNATURED_CALLER_FROM_END(server, CASDocumentation_RegisterObjectMethod, -7);
+#ifdef _WIN32
 
 	VAR_FROM_SIGNATURE_FROM_START(engine, sv_models, 13);
 	VAR_FROM_SIGNATURE_FROM_END(engine, host_frametime, 0);
@@ -170,15 +170,13 @@ C_DLLEXPORT int Meta_Attach(PLUG_LOADTIME /* now */,
 
 	VAR_FROM_SIGNATURE(engine, host_frametime);
 
-	FILL_FROM_SIGNATURE(server, CASDocumentation_RegisterObjectType);
-	FILL_FROM_SIGNATURE(server, CASDocumentation_RegisterObjectProperty);
-	FILL_FROM_SIGNATURE(server, CASDocumentation_RegisterObjectMethod);
 
 #endif
 
-	FG_InstallInlineHooks();
 
-	FG_RegisterAngelScriptHooks();
+	InstallEngineHooks();
+	RegisterAngelScriptMethods();
+	RegisterAngelScriptHooks();
 
 	return TRUE;
 }
@@ -189,6 +187,5 @@ C_DLLEXPORT int Meta_Attach(PLUG_LOADTIME /* now */,
 C_DLLEXPORT int Meta_Detach(PLUG_LOADTIME /* now */, 
 		PL_UNLOAD_REASON /* reason */) 
 {
-	//Nope, AngelScript doesn't provide unloading procedures
 	return FALSE;
 }

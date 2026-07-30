@@ -843,6 +843,7 @@ public:
 	virtual btHinge2Constraint * GetWheelConstraint(int index);
 
 	virtual void SetWheelConstraint(int index, btHinge2Constraint *pConstraint);
+	void RemoveWheelConstraint(btHinge2Constraint *pConstraint);
 
 	void DoRaycasts(btDiscreteDynamicsWorld* world);
 

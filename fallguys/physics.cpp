@@ -2689,6 +2689,15 @@ void CPhysicVehicleBehaviour::SetWheelConstraint(int index, btHinge2Constraint *
 	m_wheelConstraints[wheelIndex] = pConstraint;
 }
 
+void CPhysicVehicleBehaviour::RemoveWheelConstraint(btHinge2Constraint *pConstraint)
+{
+	for (auto &wheelConstraint : m_wheelConstraints)
+	{
+		if (wheelConstraint == pConstraint)
+			wheelConstraint = NULL;
+	}
+}
+
 bool CPhysicVehicleBehaviour::GetVehicleWheelRuntimeInfo(int wheelIndex, PhysicWheelRuntimeInfo *RuntimeInfo)
 {
 	auto constraint = GetWheelConstraint(wheelIndex);
@@ -5884,8 +5893,29 @@ void OnBeforeDeletePairCachingGhostObject(btPairCachingGhostObject *ghostobj)
 
 void OnBeforeDeleteConstraint(btTypedConstraint *constraint)
 {
+	if (!constraint)
+		return;
+
 	if (constraint->getUserConstraintType() == ConstraintType_Wheel)
 	{
+		auto wheelConstraint = (btHinge2Constraint *)constraint;
+		auto removeWheelConstraint = [wheelConstraint](btRigidBody &rigidBody)
+		{
+			auto physicObject = (CPhysicObject *)rigidBody.getUserPointer();
+
+			if (physicObject && physicObject->IsDynamicObject())
+			{
+				auto dynamicObject = (CDynamicObject *)physicObject;
+				auto vehicleBehaviour = dynamicObject->GetVehicleBehaviour();
+
+				if (vehicleBehaviour)
+					vehicleBehaviour->RemoveWheelConstraint(wheelConstraint);
+			}
+		};
+
+		removeWheelConstraint(constraint->getRigidBodyA());
+		removeWheelConstraint(constraint->getRigidBodyB());
+
 		auto pSharedUserData = (CBulletBaseSharedUserData*)constraint->getUserConstraintPtr();
 
 		if (pSharedUserData)

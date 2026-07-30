@@ -2677,11 +2677,16 @@ btHinge2Constraint * CPhysicVehicleBehaviour::GetWheelConstraint(int index)
 
 void CPhysicVehicleBehaviour::SetWheelConstraint(int index, btHinge2Constraint *pConstraint)
 {
-	if (index >= (int)m_wheelConstraints.size())
+	if (index < 0)
+		return;
+
+	size_t wheelIndex = (size_t)index;
+
+	if (wheelIndex >= m_wheelConstraints.size())
 	{
-		m_wheelConstraints.resize(index + 1);
+		m_wheelConstraints.resize(wheelIndex + 1);
 	}
-	m_wheelConstraints[index] = pConstraint;
+	m_wheelConstraints[wheelIndex] = pConstraint;
 }
 
 bool CPhysicVehicleBehaviour::GetVehicleWheelRuntimeInfo(int wheelIndex, PhysicWheelRuntimeInfo *RuntimeInfo)
@@ -3746,6 +3751,21 @@ bool CPhysicsManager::SetEntityCustomMoveSize(edict_t* ent, const Vector &mins, 
 
 bool CPhysicsManager::CreatePhysicVehicle(edict_t* ent, PhysicVehicleParams *vehicleParams, PhysicWheelParams **wheelParamArray, size_t numWheelParam)
 {
+	const int constraintAxisCount = 6;
+
+	for (size_t i = 0; i < numWheelParam; ++i)
+	{
+		auto wheelParam = wheelParamArray[i];
+
+		if (wheelParam->index < 0 ||
+			wheelParam->springIndex < 0 || wheelParam->springIndex >= constraintAxisCount ||
+			wheelParam->engineIndex < 0 || wheelParam->engineIndex >= constraintAxisCount ||
+			wheelParam->steerIndex < 0 || wheelParam->steerIndex >= constraintAxisCount)
+		{
+			return false;
+		}
+	}
+
 	auto gameObject = GetGameObject(ent);
 
 	if (!gameObject)
@@ -3799,6 +3819,9 @@ bool CPhysicsManager::CreatePhysicVehicle(edict_t* ent, PhysicVehicleParams *veh
 			continue;
 
 		auto wheelObject = GetGameObject(wheelEnt);
+
+		if (!wheelObject)
+			continue;
 
 		if (wheelObject->GetNumPhysicObject() > 0)
 		{
@@ -4706,6 +4729,9 @@ btCollisionShape *CPhysicsManager::CreateCollisionShapeFromParams(CGameObject *o
 			shape = new btCapsuleShapeZ(btScalar(shapeParams->size.x), btScalar(shapeParams->size.y));
 		}
 
+		if (!shape)
+			break;
+
 		auto shapeSharedUserData = new CBulletCollisionShapeSharedUserData();
 
 		shapeSharedUserData->m_volume = CalcVolumeForCapsuleShape(btScalar(shapeParams->size.x), btScalar(shapeParams->size.y));
@@ -4728,6 +4754,9 @@ btCollisionShape *CPhysicsManager::CreateCollisionShapeFromParams(CGameObject *o
 		{
 			shape = new btCylinderShapeZ(btVector3(shapeParams->size.x, shapeParams->size.y, shapeParams->size.z));
 		}
+
+		if (!shape)
+			break;
 
 		auto shapeSharedUserData = new CBulletCollisionShapeSharedUserData();
 

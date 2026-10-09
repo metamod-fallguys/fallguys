@@ -11,6 +11,7 @@ if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Build configuration" FORCE)
 endif()
 include("${METAMOD_SOURCE_PATH}/cmake/SDK.cmake")
+mmfg_configure_install_layout()
 include(cmake/ASExt.cmake)
 include(cmake/Bullet.cmake)
 

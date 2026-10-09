@@ -3,6 +3,8 @@
 Independent fallguys component of [metamod-fallguys](https://github.com/hzqst/metamod-fallguys).
 Component history and existing Sven Co-op binary interfaces are preserved.
 
+Usage is documented in [USAGE.md](USAGE.md).
+
 ## Build
 
 CMake 3.21+, Git, and Windows MSVC Win32 or Linux i386 multilib are required.

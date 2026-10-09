@@ -21,7 +21,8 @@ Dependency CMake variables override environment defaults. An empty path fetches 
 commit; invalid explicit paths fail. External source trees are read-only inputs.
 Plugins use `METAMOD_SOURCE_PATH` and `ASEXT_SOURCE_PATH` for local clones; SDK imports
 do not build either dependency's native library. `ANGELSCRIPT_SOURCE_PATH` selects the
-custom SDK. FallGuys additionally accepts `BULLET3_SOURCE_PATH` and `CAPSTONE_SOURCE_PATH`.
+custom SDK. FallGuys additionally accepts `BULLET3_SOURCE_PATH` and `CAPSTONE_SOURCE_PATH`,
+using the nested `thirdparty/bullet3_fork` submodule before falling back to FetchContent.
 Metamod accepts `CAPSTONE_SOURCE_PATH` and Linux `PROCMAP_SOURCE_PATH`, using initialized
 internal submodules before falling back to FetchContent.
 

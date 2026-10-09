@@ -12,6 +12,7 @@ if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
 endif()
 include("${METAMOD_SOURCE_PATH}/cmake/SDK.cmake")
 include(cmake/ASExt.cmake)
+include(cmake/Bullet.cmake)
 
 add_library(fallguys SHARED
     src/dllapi.cpp

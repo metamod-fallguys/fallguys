@@ -36,5 +36,6 @@ mmfg_capstone_headers()
 mmfg_bullet_library()
 target_include_directories(fallguys PRIVATE thirdparty/fmod)
 target_link_libraries(fallguys PRIVATE Capstone::Headers Bullet::Libraries)
+mmfg_assign_source_groups(fallguys)
 
 include(cmake/FormatValidation.cmake)

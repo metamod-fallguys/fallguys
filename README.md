@@ -24,14 +24,23 @@ Libraries install to `install/x86/<Config>/addons/metamod/dlls`; Windows install
 matching PDBs. An explicit `CMAKE_INSTALL_PREFIX` or `cmake --install --prefix`
 overrides the default. Existing build trees retain their cached install prefix.
 
+Private engine and server symbols are resolved at run time from
+[GoldSrc_VibeSignatures](https://github.com/hlnd2t/GoldSrc_VibeSignatures) gamedata through
+metamod. The build downloads the published snapshots, keeps the symbols listed in
+`scripts/manifests/fallguys.json` for Windows and Linux, and installs them to
+`addons/metamod/gamedata/fallguys/`; this needs Python 3.8+ and network access on the first
+build. `-DMMFG_SYNC_GAMEDATA=OFF` skips the download, in which case the gamedata must be
+supplied separately or the plugin refuses to load.
+
 Dependency CMake variables override environment defaults. An empty path fetches a fixed
 commit; invalid explicit paths fail. External source trees are read-only inputs.
 Plugins use `METAMOD_SOURCE_PATH` and `ASEXT_SOURCE_PATH` for local clones; SDK imports
 do not build either dependency's native library. `ANGELSCRIPT_SOURCE_PATH` selects the
-custom SDK. FallGuys additionally accepts `BULLET3_SOURCE_PATH` and `CAPSTONE_SOURCE_PATH`,
+custom SDK. FallGuys additionally accepts `BULLET3_SOURCE_PATH`,
 using the nested `thirdparty/bullet3_fork` submodule before falling back to FetchContent.
-Metamod accepts `CAPSTONE_SOURCE_PATH` and Linux `PROCMAP_SOURCE_PATH`, using initialized
-internal submodules before falling back to FetchContent.
+Metamod accepts `CAPSTONE_SOURCE_PATH`, `RAPIDJSON_SOURCE_PATH`, `CHOCOBO1HASH_SOURCE_PATH`
+and Linux `PROCMAP_SOURCE_PATH`, using initialized internal submodules before falling back
+to FetchContent.
 
 ## Formatting
 

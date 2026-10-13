@@ -1,6 +1,6 @@
 #pragma once
 
-#include "signatures.h"
+#include "gamesymbols.h"
 #include "asext_api.h"
 
 typedef void(SC_SERVER_DECL* fnCPlayerMove_PlayStepSound)(void* pthis, SC_SERVER_DUMMYARG int iType, float flVolume, bool iIsJump);

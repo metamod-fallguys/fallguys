@@ -1,0 +1,45 @@
+{
+    "schemaVersion": 1,
+    "name": "fallguys",
+    "gameVersions": [
+        "svencoop-8948",
+        "svencoop-10257"
+    ],
+    "platforms": [
+        "windows",
+        "linux"
+    ],
+    "symbols": {
+        "server": {
+            "PM_PlaySoundFX_SERVER": "function",
+            "RegisterSCScriptColor24": "function"
+        },
+        "engine": {
+            "build_number": "function",
+            "SV_Physics": "function",
+            "SV_PushEntity": "function",
+            "SV_PushMove": "function",
+            "SV_PushRotate": "function",
+            "SV_WriteMovevarsToClient": "function",
+            "SV_SingleClipMoveToEntity": "function",
+            "sv_models": "global",
+            "host_frametime": "global",
+            "movevars": "global",
+            "sv_areanodes": "global",
+            "g_groupop": "global",
+            "g_groupmask": "global"
+        }
+    },
+    "platformSymbols": {
+        "windows": {
+            "server": {
+                "CPlayerMove::PlayStepSound(int, float, bool)": "function"
+            }
+        },
+        "linux": {
+            "server": {
+                "_ZN11CPlayerMove13PlayStepSoundEifb": "function"
+            }
+        }
+    }
+}

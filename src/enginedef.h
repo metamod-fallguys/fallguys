@@ -1,6 +1,6 @@
 #pragma once
 
-#include "signatures.h"
+#include "gamesymbols.h"
 
 #include <edict.h>
 #include <const.h>
